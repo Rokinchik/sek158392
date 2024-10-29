@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Skull Game</title>
+    <style>
+        @font-face {
+            font-family: 'Intro';
+            src: url('intro.otf') format('opentype');
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #1a1a1a;
+            font-family: 'Intro', Arial, sans-serif;
+            overflow: hidden; /* Prevent scrolling on mobile */
+        }
+
+        .game-container {
+            position: relative;
+            width: 90%; /* Responsive width */
+            max-width: 400px; /* Maximum width for larger screens */
+            height: 80vh; /* Responsive height */
+            max-height: 600px; /* Maximum height for larger screens */
+            background: #2d2d2d;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .content {
+            position: relative;
+            z-index: 2;
+            padding: 5%; /* Use relative padding */
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .result-text {
+            color: white;
+            font-size: 4vw; /* Responsive font size */
+            text-align: center;
+            margin-bottom: 10px;
+            height: 40px;
+        }
+
+        .skull-container {
+            flex: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .skull {
+            width: 75%; /* Responsive width */
+            height: auto; /* Maintain aspect ratio */
+            position: absolute;
+            transition: opacity 0.5s ease;
+        }
+
+        .mix-button {
+            background: #8b0000;
+            color: white;
+            border: none;
+            padding: 3% 0; /* Responsive padding */
+            font-size: 4vw; /* Responsive font size */
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: background 0.3s;
+        }
+
+        .mix-button:hover {
+            background: #a00000;
+        }
+
+        .mix-button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+
+        .back-button {
+            color: #ffd700;
+            background: none;
+            border: none;
+            padding: 3%; /* Responsive padding */
+            font-size: 3.5vw; /* Responsive font size */
+            cursor: pointer;
+        }
+
+        .back-button:hover {
+            color: #ffed4a;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <img class="background" src="background.gif" alt="Background">
+        <div class="content">
+            <div class="skull-container">
+                <img class="skull" src="startru.gif" alt="Skull">
+            </div>
+            <div class="result-text"></div>
+            <button class="mix-button">MIX</button>
+            <button class="back-button" onclick="window.location.href='https://rokinchik.github.io/sek158392/project/index.html'">BACK</button>
+        </div>
+    </div>
+
+    <script>
+        // Disable zooming on all user interactions
+        document.addEventListener('touchmove', function (e) {
+            if (e.scale !== 1) { e.preventDefault(); }
+        }, { passive: false });
+
+        document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
+        document.addEventListener('gesturechange', function (e) { e.preventDefault(); });
+        document.addEventListener('gestureend', function (e) { e.preventDefault(); });
+        document.addEventListener('dblclick', function (e) { e.preventDefault(); });
+
+        // Disable double-tap zoom completely
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (event) => {
+            const now = new Date().getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        const skullElement = document.querySelector('.skull');
+        const resultText = document.querySelector('.result-text');
+        const mixButton = document.querySelector('.mix-button');
+
+        function getPositionText(position) {
+            return {
+                'left': 'ЛЕВЫЙ ЧЕРЕП',
+                'center': 'ЦЕНТРАЛЬНЫЙ ЧЕРЕП',
+                'right': 'ПРАВЫЙ ЧЕРЕП'
+            }[position];
+        }
+
+        const positions = ['left', 'center', 'right'];
+        
+        const skullGifs = {
+            left: 'left.gif',
+            center: 'center.gif',
+            right: 'right.gif'
+        };
+        
+        const skullSvgs = {
+            left: 'left.svg',
+            center: 'center.svg',
+            right: 'right.svg'
+        };
+
+        let isAnimating = false;
+
+        function updateSkullPosition(position) {
+            // Сначала показываем GIF
+            skullElement.src = skullGifs[position];
+            skullElement.style.opacity = '1';
+            
+            // После проигрывания одного раза GIF ( примерно 4.5 секунды), 
+            // заменяем на SVG
+            setTimeout(() => {
+                skullElement.src = skullSvgs[position];
+                skullElement.style.width = '75%'; // Make responsive
+                skullElement.style.height = 'auto'; // Maintain aspect ratio
+                skullElement.style.opacity = '1';
+            }, 4550); // Время увеличено до 4550 мс
+        }
+
+        mixButton.addEventListener('click', () => {
+            if (isAnimating) return;
+            
+            isAnimating = true;
+            mixButton.disabled = true;
+            resultText.textContent = '';
+
+            // Сразу выбираем новую позицию
+            const randomPosition = positions[Math.floor(Math.random() * positions.length)];
+            updateSkullPosition(randomPosition);
+            resultText.textContent = getPositionText(randomPosition);
+
+            // Разблокируем кнопку после завершения анимации
+            setTimeout(() => {
+                isAnimating = false;
+                mixButton.disabled = false;
+            }, 5200); // Общее время анимации
+        });
+    </script>
+</body>
+</html>
