@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <style>
+        @font-face {
+            font-family: 'Intro';
+            src: url('intro.otf') format('opentype');
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Intro', sans-serif;
+            background: radial-gradient(circle, #0f0c29, #302b63, #24243e);
+            color: #ffffff;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .game-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            width: 100%;
+        }
+
+        .game-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2.5rem;
+            border-radius: 25px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            color: #ffffff;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        #coin-container {
+            width: 100%;
+            aspect-ratio: 1;
+            max-width: 350px;
+            max-height: 350px;
+            position: relative;
+            margin: 3rem auto;
+        }
+
+        #coin-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        button {
+            background: linear-gradient(45deg, #ff5722, #ff9800);
+            border: none;
+            padding: 1.2rem 2.5rem;
+            color: white;
+            border-radius: 50px;
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            cursor: pointer;
+            transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+            margin-top: 1.5rem;
+            width: 100%;
+            max-width: 350px;
+            box-shadow: 0 5px 15px rgba(255, 87, 34, 0.6);
+        }
+
+        button:hover {
+            transform: scale(1.08);
+            box-shadow: 0 8px 25px rgba(255, 87, 34, 0.8);
+        }
+
+        button:active {
+            transform: scale(0.95) rotateX(10deg);
+            box-shadow: 0px 0px 15px 5px rgba(255, 87, 34, 0.8);
+        }
+
+        button.reset-animation {
+            transform: scale(1) rotateX(0deg);
+            transition: transform 0.2s ease-in;
+        }
+
+        #result {
+            margin-top: 1rem;
+            font-size: clamp(1.5rem, 5vw, 2rem);
+            min-height: 2.5rem;
+            color: #ff9800;
+            font-weight: bold;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 6vw, 3rem);
+            margin-bottom: 1.5rem;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        @media (max-width: 480px) {
+            .game-box {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+    <script>
+        // Disable zooming on all user interactions
+        document.addEventListener('touchmove', function (e) {
+            if (e.scale !== 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        document.addEventListener('gesturestart', function (e) {
+            e.preventDefault();
+        });
+        document.addEventListener('gesturechange', function (e) {
+            e.preventDefault();
+        });
+        document.addEventListener('gestureend', function (e) {
+            e.preventDefault();
+        });
+        document.addEventListener('dblclick', function (e) {
+            e.preventDefault();
+        });
+
+        // Disable zooming on double-tap and pinch
+        document.addEventListener('gesturestart', function (e) {
+            e.preventDefault();
+        });
+        document.addEventListener('gesturechange', function (e) {
+            e.preventDefault();
+        });
+        document.addEventListener('gestureend', function (e) {
+            e.preventDefault();
+        });
+
+        // Disable double-tap zoom completely
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (event) => {
+            const now = new Date().getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    </script>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-box">
+            <h1>Coin Flip</h1>
+            <div id="result"></div>
+            <div id="coin-container"></div>
+            <button onclick="flipCoin()">Flip the Coin</button>
+            <button g="goBack" target="_blank2" onclick="location.href='https://rokinchik.github.io/sek158392/project/index.html'">Back to menu</button>
+        </div>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdnjs.cloudflare.com/ajax/libs/three.js/0.161.0/three.module.min.js",
+                "GLTFLoader": "https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/loaders/GLTFLoader.js"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'GLTFLoader';
+
+        let scene, camera, renderer, coin;
+        let isFlipping = false;
+
+        // Set up the scene
+        scene = new THREE.Scene();
+        
+        // Calculate container dimensions
+        const container = document.getElementById('coin-container');
+        const aspect = container.clientWidth / container.clientHeight;
+        camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
+        
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Adjust for device pixel ratio to improve scaling
+        renderer.setClearColor(0x000000, 0);
+        container.appendChild(renderer.domElement);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 3);
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 6);
+        directionalLight.position.set(5, 5, 5);
+        scene.add(directionalLight);
+
+        const pointLight = new THREE.PointLight(0xffddaa, 3, 10);
+        pointLight.position.set(2, 2, 2);
+        scene.add(pointLight);
+
+        camera.position.z = 5;
+
+        // Add button animations
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach(button => {
+            button.addEventListener('click', function() {
+                const currentButton = this;
+
+                setTimeout(() => {
+                    currentButton.classList.add('reset-animation');
+
+                    setTimeout(() => {
+                        currentButton.classList.remove('reset-animation');
+                    }, 200);
+                }, 200);
+            });
+        });
+
+        // Load 3D model
+        const loader = new GLTFLoader();
+        loader.load('coin.glb', function(gltf) {
+            coin = gltf.scene;
+            scene.add(coin);
+            
+            coin.rotation.set(0, 0, 0);
+            coin.position.set(0, 0, 0);
+            coin.scale.set(1.2, 1.2, 1.2);
+            
+            animate();
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+
+        async function flipCoin() {
+            if (isFlipping || !coin) return;
+            isFlipping = true;
+            
+            const result = document.getElementById('result');
+            result.textContent = '';
+
+            const isHeads = Math.random() < 0.5;
+            const finalRotation = isHeads ? Math.PI * 4 : Math.PI * 5;
+
+            const duration = 1500;
+            const startTime = Date.now();
+            const startRotation = coin.rotation.y;
+            
+            function animateFlip() {
+                const elapsed = Date.now() - startTime;
+                const progress = elapsed / duration;
+
+                if (progress < 1) {
+                    const y = Math.sin(progress * Math.PI) * 2;
+                    coin.position.y = y;
+                    coin.rotation.y = startRotation + (finalRotation * progress);
+
+                    requestAnimationFrame(animateFlip);
+                } else {
+                    coin.position.y = 0;
+                    coin.rotation.y = startRotation + finalRotation;
+                    result.textContent = isHeads ? 'HEADS!' : 'TAILS!';
+                    isFlipping = false;
+                }
+            }
+
+            animateFlip();
+        }
+
+        window.flipCoin = flipCoin;
+
+        window.addEventListener('resize', onWindowResize, false);
+
+        function onWindowResize() {
+            const container = document.getElementById('coin-container');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            
+            renderer.setSize(width, height);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Adjust renderer for device pixel ratio
+        }
+    </script>
+</body>
+</html>
