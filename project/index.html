@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Selection</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: #121212;
+            color: #ffffff;
+            overflow-x: hidden;
+            padding-top: 80px;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background: #ffffff;
+            border-radius: 50%;
+            opacity: 0.8;
+            animation: twinkle var(--duration) infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            padding: 20px;
+            justify-items: center;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+            max-width: 220px;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+            border-color: rgba(0, 255, 255, 0.2);
+        }
+
+        .game-image {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 1 / 1;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .game-card:hover .game-image {
+            transform: scale(1.05);
+        }
+
+        .play-button {
+            background: #43a047;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 8px 0;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .play-button:hover {
+            background: #2e7d32;
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.4);
+        }
+
+       .top-bar {
+    position: fixed;
+    top: 20px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
+    z-index: 1000;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.language-switcher, .device-info {
+    padding: 8px 15px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+
+        .language-switcher:hover, .device-info:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .lang-flag {
+            width: 28px;
+            height: 28px;
+            object-fit: cover;
+            display: inline-block;
+            margin-right: 8px;
+            border-radius: 50%;
+            vertical-align: middle;
+        }
+
+        .lang-text, .device-info-text {
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            line-height: 40px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .lang-options {
+    position: absolute;
+    top: calc(100% + 5px);
+    right: 40px; /* Изменено с right: 0 */
+    background: rgba(50, 50, 50, 0.8);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    transform-origin: top;
+    transform: scaleY(0);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    min-width: 120px;
+    pointer-events: none;
+}
+
+.lang-options.show {
+    transform: scaleY(1);
+    opacity: 1;
+    pointer-events: all;
+}
+
+        .lang-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .lang-option:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .hidden {
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.hidden .lang-options {
+    transform: scaleY(0);
+    opacity: 0;
+    pointer-events: none;
+}
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+
+    <div class="top-bar">
+        <div class="device-info" id="device-info">
+            <span class="device-info-icon" id="device-icon">💻</span>
+            <span class="device-info-text" id="device-text">PC</span>
+        </div>
+
+        <div class="language-switcher" id="language-switcher">
+            <div class="current-lang" onclick="toggleLangMenu()">
+                <img src="avas/ru.png" alt="Russian" class="lang-flag" id="current-flag">
+                <span class="lang-text" id="current-lang-text">RU</span>
+            </div>
+            <div class="lang-options" id="lang-options">
+                <div class="lang-option" onclick="switchLanguage('en')">
+                    <img src="avas/en.png" alt="English" class="lang-flag">
+                    <span class="lang-text">EN</span>
+                </div>
+                <div class="lang-option" onclick="switchLanguage('hi')">
+                    <img src="avas/hin.png" alt="Hindi" class="lang-flag">
+                    <span class="lang-text">हिन्दी (HI)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="game-card">
+            <img src="avas/1.png" alt="Coin Game" class="game-image">
+            <a href="coins/coin.html" class="play-button" data-ru="ОТКРЫТЬ" data-en="OPEN" data-hi="खोलें">ОТКРЫТЬ</a>
+        </div>
+        <div class="game-card">
+            <img src="avas/2.png" alt="Lucky Jet" class="game-image">
+            <a href="LuckySky/index.html" class="play-button" data-ru="ОТКРЫТЬ" data-en="OPEN" data-hi="खोलें">ОТКРЫТЬ</a>
+        </div>
+        <div class="game-card">
+            <img src="avas/3.jpg" alt="Mines" class="game-image">
+            <a href="mines/index.html" class="play-button" data-ru="ОТКРЫТЬ" data-en="OPEN" data-hi="खोलें">ОТКРЫТЬ</a>
+        </div>
+        <div class="game-card">
+            <img src="avas/4.png" alt="Bombucks" class="game-image">
+            <a href="bombucks/index.html" class="play-button" data-ru="ОТКРЫТЬ" data-en="OPEN" data-hi="खोलें">ОТКРЫТЬ</a>
+        </div>
+        <div class="game-card">
+            <img src="avas/5.png" alt="Footboll" class="game-image">
+            <a href="footboll/index.html" class="play-button" data-ru="ОТКРЫТЬ" data-en="OPEN" data-hi="खोलें">ОТКРЫТЬ</a>
+        </div>
+        <div class="game-card">
+            <img src="avas/6.png" alt="PENALTYSHOOTOUT" class="game-image">
+            <a href="PENALTYSHOOTOUT/index.html" class="play-button" data-ru="ОТКРЫТЬ" data-en="OPEN" data-hi="खोलें">ОТКРЫТЬ</a>
+        </div>
+        <div class="game-card">
+            <img src="avas/7.png" alt="brawlPirates" class="game-image">
+            <a href="brawlPirates/index.html" class="play-button" data-ru="ОТКРЫТЬ" data-en="OPEN" data-hi="खोलें">ОТКРЫТЬ</a>
+        </div>
+        <div class="game-card">
+            <img src="avas/8.jpg" alt="Minesind" class="game-image">
+            <a href="minesind/index.html" class="play-button" data-ru="ОТКРЫТЬ" data-en="OPEN" data-hi="खोलें">ОТКРЫТЬ</a>
+        </div>
+    </div>
+
+    <script>
+        function createStars() {
+            const starsContainer = document.querySelector('.stars');
+            const count = 300;
+
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const size = Math.random() * 2;
+                const duration = 3 + Math.random() * 4;
+
+                star.style.left = `${x}%`;
+                star.style.top = `${y}%`;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.setProperty('--duration', `${duration}s`);
+
+                starsContainer.appendChild(star);
+            }
+        }
+
+        function toggleLangMenu() {
+            const options = document.getElementById('lang-options');
+            options.classList.toggle('show');
+        }
+
+        function switchLanguage(lang) {
+            const currentFlag = document.getElementById('current-flag');
+            const currentText = document.getElementById('current-lang-text');
+
+            currentFlag.src = `avas/${lang === 'hi' ? 'hin' : lang}.png`;
+            currentText.textContent = lang.toUpperCase();
+
+            document.querySelectorAll('.play-button').forEach(button => {
+                button.textContent = button.getAttribute(`data-${lang}`);
+            });
+
+            document.documentElement.lang = lang;
+
+            document.getElementById('lang-options').classList.remove('show');
+
+            const langOptions = document.getElementById('lang-options');
+            langOptions.innerHTML = '';
+
+            const otherLangs = ['ru', 'en', 'hi'].filter(l => l !== lang);
+            otherLangs.forEach(otherLang => {
+                langOptions.innerHTML += `
+                    <div class="lang-option" onclick="switchLanguage('${otherLang}')">
+                        <img src="avas/${otherLang === 'hi' ? 'hin' : otherLang}.png" alt="${otherLang.toUpperCase()}" class="lang-flag">
+                        <span class="lang-text">${otherLang === 'hi' ? 'हिन्दी (HI)' : otherLang.toUpperCase()}</span>
+                    </div>
+                `;
+            });
+            updateDeviceInfo(lang);
+        }
+
+        function detectDevice() {
+            const userAgent = navigator.userAgent.toLowerCase();
+            if (/android/i.test(userAgent)) {
+                return 'android';
+            } else if (/iphone|ipad|ipod/i.test(userAgent)) {
+                return 'ios';
+            } else {
+                return 'pc';
+            }
+        }
+
+        function updateDeviceInfo(lang) {
+            const deviceType = detectDevice();
+            const deviceIcon = document.getElementById('device-icon');
+            const deviceText = document.getElementById('device-text');
+
+            let iconClass, text;
+            switch (deviceType) {
+                case 'android':
+                    iconClass = '📱';
+                    text = lang === 'ru' ? 'Android' : lang === 'hi' ? 'एन्ड्रोयड' : 'Android';
+                    break;
+                case 'ios':
+                    iconClass = '📱';
+                    text = lang === 'ru' ? 'iOS' : lang === 'hi' ? 'आईओएस' : 'iOS';
+                    break;
+                default:
+                    iconClass = '💻';
+                    text = lang === 'ru' ? 'ПК' : lang === 'hi' ? 'पीसी' : 'PC';
+            }
+
+            deviceIcon.textContent = iconClass;
+            deviceText.textContent = text;
+        }
+
+        let lastScrollTop = 0;
+        const topBar = document.querySelector('.top-bar');
+        let isHidden = false;
+
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+            // Закрываем меню выбора языка при скролле
+            document.getElementById('lang-options').classList.remove('show');
+
+            // Скрываем элементы при скролле вниз
+            if (scrollTop > lastScrollTop && scrollTop > 50 && !isHidden) {
+                topBar.classList.add('hidden');
+                isHidden = true;
+            }
+
+            // Показываем элементы при скролле вверх или в начале страницы
+            if (scrollTop <= 0 && isHidden) {
+                topBar.classList.remove('hidden');
+                isHidden = false;
+            }
+
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+        }, false);
+
+        document.addEventListener('click', (e) => {
+            const switcher = document.querySelector('.language-switcher');
+            if (!switcher.contains(e.target)) {
+                document.getElementById('lang-options').classList.remove('show');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            createStars();
+            switchLanguage('ru');
+            updateDeviceInfo('ru');
+        });
+    </script>
+</body>
+</html>
