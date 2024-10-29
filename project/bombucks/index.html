@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Rokin Game</title>
+    <style>
+        @font-face {
+            font-family: 'Intro';
+            src: url('static/intro.otf') format('opentype');
+        }
+        
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            background: #000;
+            overflow: hidden;
+        }
+
+        .title {
+            font-family: 'Intro', sans-serif;
+            color: #fff;
+            font-size: 48px;
+            margin-bottom: 10px;
+            margin-top: 25px;
+            text-shadow: 0 0 10px #00ffcc,
+                         0 0 20px #00ffcc,
+                         0 0 30px #00ffcc;
+            letter-spacing: 5px;
+        }
+
+        .container {
+            text-align: center;
+            margin-top: 35px;
+        }
+
+        .game-board {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 10px auto;
+            min-height: 200px;
+        }
+
+        .row {
+            display: flex;
+            width: 100%;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideIn 0.5s forwards ease-out;
+        }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        select {
+            padding: 15px 25px;
+            font-size: 18px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid #00ffcc;
+            border-radius: 15px;
+            margin: 10px 0;
+            cursor: pointer;
+            
+            backdrop-filter: blur(5px);
+            font-family: 'Intro', sans-serif;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+        }
+
+        select:hover {
+            background: rgba(0, 255, 204, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .square {
+            margin: 2.7px;
+            background: linear-gradient(145deg, #1f1f1f, #2b2b2b);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            box-shadow: 0 0 0 4px #555555;
+        }
+
+        .neon-circle {
+            width: 60%;
+            height: 45%;
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 0 30px #00ff99,
+                       0 0 60px #00ffcc,
+                       0 0 90px #00ffcc,
+                       0 0 120px #00ffcc;
+            animation: appear 1s ease forwards;
+            opacity: 0;
+            background-color: transparent;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 10px;
+        }
+
+        button {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid #00ffcc;
+            border-radius: 15px;
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            
+            width: 100%;
+            max-width: 200px;
+            font-family: 'Intro', sans-serif;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+        }
+
+        button:hover {
+            background: rgba(0, 255, 204, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .back-button {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            font-family: 'Intro', sans-serif;
+            z-index: 10;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        #particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        @keyframes floatingParticle {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+            100% { transform: translateY(0) rotate(360deg); }
+        }
+
+        .floating-particle {
+            position: absolute;
+            background: radial-gradient(circle, rgba(0,255,204,0.8) 0%, rgba(0,255,204,0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatingParticle 3s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="title">ROKIN</h1>
+    <canvas id="particleCanvas"></canvas>
+    <div>
+        <select id="fieldSelect">
+            <option value="6x15">6x15</option>
+            <option value="3x6">3x6</option>
+            <option value="2x3">2x3</option>
+            <option value="4x9">4x9</option>
+            <option value="5x12">5x12</option>
+        </select>
+    </div>
+    <div class="game-board" id="gameBoard"></div>
+    <div class="button-container">
+        <button class="reset-button">reset</button>
+        <button class="play-button">play</button>
+    </div>
+    <button class="back-button" onclick="window.location.href='https://rokinchik.github.io/sek158392/project/index.html';">Back</button>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        // Disable zooming on all user interactions
+        document.addEventListener('touchmove', function (e) {
+            if (e.scale !== 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        document.addEventListener('gesturestart', function (e) {
+            e.preventDefault();
+        });
+        document.addEventListener('gesturechange', function (e) {
+            e.preventDefault();
+        });
+        document.addEventListener('gestureend', function (e) {
+            e.preventDefault();
+        });
+        document.addEventListener('dblclick', function (e) {
+            e.preventDefault();
+        });
+    </script>
+    <script>
+        // Disable zooming on double-tap and pinch
+        document.addEventListener('gesturestart', function (e) {
+            e.preventDefault();
+        });
+        document.addEventListener('gesturechange', function (e) {
+            e.preventDefault();
+        });
+        document.addEventListener('gestureend', function (e) {
+            e.preventDefault();
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const gameBoard = document.getElementById('gameBoard');
+            const playButton = document.querySelector('.play-button');
+            const resetButton = document.querySelector('.reset-button');
+            const fieldSelect = document.getElementById('fieldSelect');
+            let dotsCount = 0;
+            let numRows = 5;
+            let numCols = 6;
+            let maxDots = 15;
+            let squareSize = 52;
+
+            function initializeBoard() {
+                gameBoard.innerHTML = '';
+                for (let i = 0; i < numRows; i++) {
+                    const newRow = document.createElement('div');
+                    newRow.className = 'row';
+                    for (let j = 0; j < numCols; j++) {
+                        const newSquare = document.createElement('div');
+                        newSquare.className = 'square';
+                        newSquare.style.width = `${squareSize}px`;
+                        newSquare.style.height = `${squareSize}px`;
+
+                        const neonCircle = document.createElement('div');
+                        neonCircle.className = 'neon-circle';
+                        newSquare.appendChild(neonCircle);
+
+                        newRow.appendChild(newSquare);
+                    }
+                    gameBoard.appendChild(newRow);
+                }
+                updateSelectAndButtonWidth();
+            }
+
+            function triggerHapticFeedback() {
+                if (window.Telegram && window.Telegram.WebApp.HapticFeedback) {
+                    window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                }
+            }
+
+            function updateBoardSize() {
+                triggerHapticFeedback();
+                const rowWidth = squareSize * numCols + (numCols - 1) * 2.7;
+                gameBoard.style.width = `${rowWidth}px`;
+                updateSelectAndButtonWidth();
+            }
+
+            function updateSelectAndButtonWidth() {
+                const firstRow = gameBoard.querySelector('.row');
+                if (firstRow) {
+                    const firstRowWidth = firstRow.offsetWidth;
+                    fieldSelect.style.width = `${firstRowWidth}px`;
+                }
+            }
+
+            function placeDot(rowNumber) {
+                triggerHapticFeedback();
+                const rows = Array.from(gameBoard.querySelectorAll('.row'));
+                const squares = rows[numRows - 1 - rowNumber].querySelectorAll('.square');
+                const randomSquare = Math.floor(Math.random() * squares.length);
+
+                const neonCircle = squares[randomSquare].querySelector('.neon-circle');
+                neonCircle.style.opacity = 1;
+            }
+
+            function addRowWithDot() {
+                triggerHapticFeedback();
+                const newRow = document.createElement('div');
+                newRow.className = 'row';
+                for (let i = 0; i < numCols; i++) {
+                    const newSquare = document.createElement('div');
+                    newSquare.className = 'square';
+                    newSquare.style.width = `${squareSize}px`;
+                    newSquare.style.height = `${squareSize}px`;
+
+                    const neonCircle = document.createElement('div');
+                    neonCircle.className = 'neon-circle';
+                    newSquare.appendChild(neonCircle);
+
+                    newRow.appendChild(newSquare);
+                }
+                gameBoard.insertBefore(newRow, gameBoard.firstChild);
+                placeDotInNewRow(newRow);
+                updateSelectAndButtonWidth();
+            }
+
+            function placeDotInNewRow(newRow) {
+                const squares = newRow.querySelectorAll('.square');
+                const randomSquare = Math.floor(Math.random() * squares.length);
+
+                const neonCircle = squares[randomSquare].querySelector('.neon-circle');
+                neonCircle.style.opacity = 1;
+            }
+
+            function removeRowWithDot() {
+                gameBoard.removeChild(gameBoard.lastChild);
+                updateSelectAndButtonWidth();
+            }
+
+            function maintainRowCount() {
+                while (gameBoard.children.length > numRows) {
+                    gameBoard.removeChild(gameBoard.lastChild);
+                }
+            }
+
+            function clearAllSquares() {
+                const circles = gameBoard.querySelectorAll('.neon-circle');
+                circles.forEach(circle => circle.style.opacity = 0);
+            }
+
+            resetButton.addEventListener('click', () => {
+                triggerHapticFeedback();
+                clearAllSquares();
+                dotsCount = 0;
+            });
+
+            playButton.addEventListener('click', () => {
+                if (dotsCount >= maxDots) {
+                    alert('Игра окончена!');
+                    return;
+                }
+
+                if (dotsCount < numRows) {
+                    placeDot(dotsCount);
+                } else {
+                    removeRowWithDot();
+                    addRowWithDot();
+                }
+                dotsCount++;
+                maintainRowCount();
+            });
+
+            fieldSelect.addEventListener('change', () => {
+                const selectedField = fieldSelect.value;
+                if (selectedField === "6x15") {
+                    numRows = 5;
+                    numCols = 6;
+                    maxDots = 15;
+                    squareSize = 52;
+                } else if (selectedField === "3x6") {
+                    numRows = 3;
+                    numCols = 3;
+                    maxDots = 6;
+                    squareSize = 70;
+                } else if (selectedField === "2x3") {
+                    numRows = 2;
+                    numCols = 2;
+                    maxDots = 3;
+                    squareSize = 90;
+                } else if (selectedField === "4x9") {
+                    numRows = 4;
+                    numCols = 4;
+                    maxDots = 9;
+                    squareSize = 65;
+                } else if (selectedField === "5x12") {
+                    numRows = 5;
+                    numCols = 5;
+                    maxDots = 12;
+                    squareSize = 60;
+                }
+                initializeBoard();
+                updateBoardSize();
+                clearAllSquares();
+                dotsCount = 0;
+            });
+
+            window.addEventListener('resize', () => {
+                updateBoardSize();
+            });
+
+            initializeBoard();
+            updateBoardSize();
+        });
+
+        // Анимированный фон с canvas
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        resizeCanvas();
+
+        const particles = [];
+        const particleCount = 100;
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = Math.random() * 3 - 1.5;
+                this.speedY = Math.random() * 3 - 1.5;
+                this.color = `rgba(0, ${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 0.5 + 0.2})`;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+        }
+
+        function init() {
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        init();
+        animate();
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+        });
+
+        // Disable double-tap zoom completely
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (event) => {
+            const now = new Date().getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    </script>
+</body>
+</html>

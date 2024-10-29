@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ROKIN Game</title>
+    <style>
+        @font-face {
+            font-family: 'Intro';
+            src: url('static/intro.otf') format('opentype');
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+        }
+        body {
+            background: linear-gradient(135deg, #19a656 0%, #0e8534 100%);
+            font-family: 'Intro', Arial, sans-serif;
+            overflow: hidden;
+            min-height: 100vh;
+        }
+
+        /* Enhanced animations */
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, #19a656, #0e8534, #1a8d4f, #156b3d);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            z-index: -1;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            flex-direction: column;
+            padding-top: 20px;
+            height: 100vh;
+            position: relative;
+        }
+
+        .brand-text {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 36px;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5),
+                         0 0 20px rgba(255, 255, 255, 0.3),
+                         0 0 30px rgba(255, 255, 255, 0.2);
+            font-weight: bold;
+            letter-spacing: 4px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.5),
+                            0 0 20px rgba(255, 255, 255, 0.3),
+                            0 0 30px rgba(255, 255, 255, 0.2);
+            }
+            to {
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.7),
+                            0 0 30px rgba(255, 255, 255, 0.5),
+                            0 0 40px rgba(255, 255, 255, 0.3);
+            }
+        }
+
+        .logo {
+            width: 50%;
+            display: block;
+            margin: 70px auto 10px;
+            max-width: 100%;
+            height: auto;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(2deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        .coefficient {
+            font-family: 'Intro', sans-serif;
+            font-size: 50px;
+            color: #ffffff;
+            text-align: center;
+            margin: 20px auto;
+            text-shadow: 0px 0px 10px rgba(255, 255, 255, 0.8);
+            opacity: 0;
+            transform: scale(1);
+            transition: opacity 0.6s ease;
+        }
+
+        .coefficient.show {
+            opacity: 1;
+            animation: pulse 0.6s ease forwards;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        .placeholder {
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .question-mark {
+            font-size: 100px;
+            color: white;
+            text-align: center;
+            display: block;
+            margin: 0 auto;
+            animation: spin-scale 3s infinite ease-in-out;
+        }
+
+        .footballer {
+            width: 30%;
+            height: auto;
+            max-width: 150px;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .footballer.show {
+            opacity: 1;
+            transform: scale(1) rotate(360deg);
+        }
+
+        @keyframes spin-scale {
+            0% { transform: scale(1) rotate(0deg); opacity: 1; }
+            50% { transform: scale(1.5) rotate(180deg); opacity: 0.5; }
+            100% { transform: scale(1) rotate(360deg); opacity: 1; }
+        }
+
+        .button {
+            margin: 20px auto;
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #ffcc00, #ff9900);
+            color: #333;
+            font-family: 'Intro', sans-serif;
+            font-size: 20px;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .button:before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(45deg);
+            transition: all 0.3s ease;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0px 12px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .button:hover:before {
+            left: 100%;
+        }
+
+        .button:active {
+            transform: translateY(4px);
+            box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50px;
+            padding: 12px 30px;
+            color: white;
+            font-family: 'Intro', sans-serif;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 20px;
+            position: relative;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .back-button:active {
+            transform: scale(0.95);
+        }
+
+        .back-button svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+            transition: transform 0.3s ease;
+        }
+
+        .back-button:hover svg {
+            transform: translateX(-5px);
+        }
+
+        @media (max-width: 600px) {
+            .brand-text {
+                font-size: 28px;
+            }
+            .logo {
+                width: 70%;
+                margin-top: 60px;
+            }
+            .coefficient {
+                font-size: 40px;
+            }
+            .placeholder {
+                height: 200px;
+            }
+            .footballer {
+                width: 100%;
+                max-width: 180px;
+            }
+            .back-button {
+                padding: 10px 25px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-animation"></div>
+    <div class="container">
+        <div class="brand-text">ROKIN</div>
+        <img src="static/foot/logo.png" alt="Logo" class="logo">
+        <div class="coefficient">x0.00</div>
+
+        <div class="placeholder">
+            <div class="question-mark">?</div>
+            <img src="static/foot/1.png" alt="Footballer" class="footballer" id="footballer">
+        </div>
+
+        <div style="display: flex; justify-content: center; width: 100%;">
+            <button class="back-button" onclick="window.location.href='https://rokinchik.github.io/sek158392/project/index.html';">
+                <svg viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+                </svg>
+                Back to Games
+            </button>
+            <button class="button" onclick="revealFootballer()">Start Hack</button>
+        </div>
+    </div>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        const footballers = [
+            'static/foot/1.png',
+            'static/foot/2.png',
+            'static/foot/3.png',
+            'static/foot/4.png',
+            'static/foot/5.png'
+        ];
+
+        function triggerHapticFeedback() {
+            if (window.Telegram?.WebApp?.HapticFeedback) {
+                try {
+                    window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                } catch (e) {
+                    console.log('Haptic feedback not supported');
+                }
+            }
+        }
+
+        function revealFootballer() {
+            document.querySelector('.question-mark').style.display = 'none';
+            triggerHapticFeedback();
+
+            const randomFootballer = footballers[Math.floor(Math.random() * footballers.length)];
+            const footballerImg = document.getElementById('footballer');
+
+            const img = new Image();
+            img.onload = function() {
+                footballerImg.src = randomFootballer;
+                footballerImg.classList.add('show');
+            };
+            img.src = randomFootballer;
+
+            let targetCoefficient = parseFloat((Math.random() * 9 + 1).toFixed(2));
+            let currentCoefficient = 1.00;
+            const coefficientElement = document.querySelector('.coefficient');
+
+            coefficientElement.classList.remove('show');
+            void coefficientElement.offsetWidth;
+
+            const interval = setInterval(() => {
+                currentCoefficient += 0.05;
+                if (currentCoefficient >= targetCoefficient) {
+                    currentCoefficient = targetCoefficient;
+                    clearInterval(interval);
+                }
+                coefficientElement.textContent = 'x' + currentCoefficient.toFixed(2);
+            }, 50);
+
+            coefficientElement.classList.add('show');
+        }
+
+        // Disable zooming on all user interactions
+        document.addEventListener('touchmove', function (e) {
+            if (e.scale !== 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
+        document.addEventListener('gesturechange', function (e) { e.preventDefault(); });
+        document.addEventListener('gestureend', function (e) { e.preventDefault(); });
+        document.addEventListener('dblclick', function (e) { e.preventDefault(); });
+
+        // Disable double-tap zoom completely
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (event) => {
+            const now = new Date().getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        // Add some random sparkle effects to the background
+        function createSparkle() {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+            sparkle.style.left = Math.random() * 100 + '%';
+            sparkle.style.top = Math.random() * 100 + '%';
+            document.body.appendChild(sparkle);
+
+            setTimeout(() => {
+                sparkle.remove();
+            }, 1000);
+        }
+
+        setInterval(createSparkle, 300);
+    </script>
+</body>
+</html>
