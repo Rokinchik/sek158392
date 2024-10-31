@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prosto+One&display=swap" rel="stylesheet">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Lucky jet</title>
+    <link rel="stylesheet" href="index.css">
+
+    <style>
+        .button2 {
+            margin: 500px;
+        }
+    </style>
+</head>
+<body class="page">
+    <div class="cv">
+        <img id="ob1" class="obloko" src="images/obl.svg">
+        <img id="ob2" class="obloko2" src="images/obl.svg">
+    </div>
+
+    <div class="winner">
+        <img class="luck" src="images/Lucky.svg">
+        <img class="win" src="images/1win_logo.png">
+    </div>
+
+    <div class="rocket">
+        <button class="button2" target="_blank2" onclick="location.href='https://rokinchik.github.io/sek158392/project/index.html'">Back to menu</button>
+        <img id="cup" class="rocket_fire" src="./images/fire.gif">
+        <img id="sup" class="rocket_boy" src="./images/boy.gif">
+        <div id="responseText2" class="text2"></div>
+        <div id="responseText" class="text"></div>
+        <div id="coefficients" class="kif"></div>
+        <div class="loader2"></div>
+        <div id="ld" class="loader">
+            <div id="ld" class="bar"></div>
+        </div>
+    </div>
+
+    <script src="script1.js"></script>
+    <div id="result" class="rand"></div>
+
+    <script>
+        // Disable zooming on all user interactions
+        document.addEventListener('touchmove', function (e) {
+            if (e.scale !== 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        document.addEventListener('gesturestart', function (e) {
+            e.preventDefault();
+        });
+        document.addEventListener('gesturechange', function (e) {
+            e.preventDefault();
+        });
+        document.addEventListener('gestureend', function (e) {
+            e.preventDefault();
+        });
+        document.addEventListener('dblclick', function (e) {
+            e.preventDefault();
+        });
+    </script>
+
+    <script>
+        // Disable zooming on double-tap and pinch
+        document.addEventListener('gesturestart', function (e) {
+            e.preventDefault();
+        });
+        document.addEventListener('gesturechange', function (e) {
+            e.preventDefault();
+        });
+        document.addEventListener('gestureend', function (e) {
+            e.preventDefault();
+        });
+    </script>
+
+    <script>
+        // Disable double-tap zoom completely
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (event) => {
+            const now = new Date().getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    </script>
+
+</body>
+</html>
