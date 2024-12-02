@@ -20,46 +20,46 @@ body {
   will-change: transform;
 }
 
-/* Общие стили для контейнера */
+
 .logos2 {
-  display: flex; /* Для центровки изображения */
+  display: flex; 
   justify-content: center;
   align-items: center;
-  max-width: 300px; /* Максимальная ширина контейнера */
-  margin: 0 auto; /* Центровка по горизонтали */
-  padding: 0px; /* Отступы вокруг изображения */
-  border: none; /* Убираем границу */
-  border-radius: 0; /* Убираем скругленные углы */
-  background-color: transparent; /* Убираем белый фон */
+  max-width: 300px;
+  margin: 0 auto;
+  padding: 0px; 
+  border: none; 
+  border-radius: 0;
+  background-color: transparent;
 }
 
-/* Стили для изображения */
+
 .logos2 img {
-  width: 100%; /* Изображение занимает всю ширину контейнера */
-  max-width: 300px; /* Ограничение максимальной ширины */
-  height: auto; /* Сохраняет пропорции изображения */
-  object-fit: contain; /* Гарантирует корректное отображение */
+  width: 100%; 
+  max-width: 300px;
+  height: auto; 
+  object-fit: contain; 
 }
 
-/* Адаптивные стили */
+
 @media (max-width: 768px) {
   .logos2 {
-      max-width: 500px; /* Уменьшаем ширину контейнера на мобильных устройствах */
+      max-width: 500px; 
       margin-top: 100px;
   }
 
   .logos2 img {
-      max-width: 500px; /* Уменьшаем изображение для мобильных */
+      max-width: 500px; 
   }
 }
 
 @media (min-width: 769px) {
   .logos2 {
-      max-width: 900px; /* Увеличиваем ширину контейнера на больших экранах */
+      max-width: 900px; 
   }
 
   .logos2 img {
-      max-width: 900px; /* Увеличиваем изображение для ПК */
+      max-width: 900px;
   }
 }
 
@@ -256,6 +256,28 @@ body {
   height: 1.25rem;
   width: .75rem;
 }
+
+.back-button {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: rgb(143, 36, 7);
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 5px; 
+}
+
+
+.back-button:hover {
+  background-color: darkred;
+}
+
 
 .select-traps__arrow-icon_prev {
   transform: rotate(180deg);
