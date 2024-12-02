@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         @font-face {
             font-family: 'Intro';
@@ -15,45 +15,35 @@
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Intro', sans-serif;
-            background: radial-gradient(circle, #0f0c29, #302b63, #24243e);
-            color: #ffffff;
-            overflow: hidden;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
         .game-container {
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            font-family: 'Intro', sans-serif;
             padding: 20px;
-            width: 100%;
         }
 
         .game-box {
             background: rgba(255, 255, 255, 0.1);
-            padding: 2.5rem;
-            border-radius: 25px;
-            backdrop-filter: blur(12px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            padding: 2rem;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             text-align: center;
-            color: #ffffff;
+            color: white;
             width: 100%;
-            max-width: 600px;
+            max-width: 500px;
         }
 
         #coin-container {
             width: 100%;
             aspect-ratio: 1;
-            max-width: 350px;
-            max-height: 350px;
+            max-width: 300px;
+            max-height: 300px;
             position: relative;
-            margin: 3rem auto;
+            margin: 2rem auto;
         }
 
         #coin-container canvas {
@@ -61,107 +51,62 @@
             height: 100% !important;
         }
 
-        button {
-            background: linear-gradient(45deg, #ff5722, #ff9800);
-            border: none;
-            padding: 1.2rem 2.5rem;
-            color: white;
-            border-radius: 50px;
-            font-size: clamp(1rem, 3vw, 1.2rem);
-            cursor: pointer;
-            transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
-            margin-top: 1.5rem;
-            width: 100%;
-            max-width: 350px;
-            box-shadow: 0 5px 15px rgba(255, 87, 34, 0.6);
-        }
+button {
+    background: linear-gradient(45deg, #4CAF50, #45a049);
+    border: none;
+    padding: 1rem 2rem;
+    color: white;
+    border-radius: 50px;
+    font-size: clamp(1rem, 3vw, 1.2rem);
+    cursor: pointer;
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+    margin-top: 1rem;
+    width: 100%;
+    max-width: 300px;
+}
 
-        button:hover {
-            transform: scale(1.08);
-            box-shadow: 0 8px 25px rgba(255, 87, 34, 0.8);
-        }
+button:hover {
+    transform: scale(1.05);
+}
 
-        button:active {
-            transform: scale(0.95) rotateX(10deg);
-            box-shadow: 0px 0px 15px 5px rgba(255, 87, 34, 0.8);
-        }
+button:active {
+    transform: scale(0.95) rotateX(10deg);
+    box-shadow: 0px 0px 15px 5px rgba(0, 128, 0, 0.7);
+}
 
-        button.reset-animation {
-            transform: scale(1) rotateX(0deg);
-            transition: transform 0.2s ease-in;
-        }
+/* Добавим класс для отката анимации */
+button.reset-animation {
+    transform: scale(1) rotateX(0deg); /* Возвращаем к исходному состоянию */
+    transition: transform 0.2s ease-in; /* Анимация возвращения */
+}
 
         #result {
             margin-top: 1rem;
-            font-size: clamp(1.5rem, 5vw, 2rem);
-            min-height: 2.5rem;
-            color: #ff9800;
-            font-weight: bold;
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
+            min-height: 2rem;
+            color: #4CAF50;
         }
 
         h1 {
-            font-size: clamp(2rem, 6vw, 3rem);
-            margin-bottom: 1.5rem;
-            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            font-size: clamp(1.5rem, 5vw, 2rem);
+            margin-bottom: 1rem;
         }
 
         @media (max-width: 480px) {
             .game-box {
-                padding: 1.5rem;
+                padding: 1rem;
             }
         }
     </style>
-    <script>
-        // Disable zooming on all user interactions
-        document.addEventListener('touchmove', function (e) {
-            if (e.scale !== 1) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-
-        document.addEventListener('gesturestart', function (e) {
-            e.preventDefault();
-        });
-        document.addEventListener('gesturechange', function (e) {
-            e.preventDefault();
-        });
-        document.addEventListener('gestureend', function (e) {
-            e.preventDefault();
-        });
-        document.addEventListener('dblclick', function (e) {
-            e.preventDefault();
-        });
-
-        // Disable zooming on double-tap and pinch
-        document.addEventListener('gesturestart', function (e) {
-            e.preventDefault();
-        });
-        document.addEventListener('gesturechange', function (e) {
-            e.preventDefault();
-        });
-        document.addEventListener('gestureend', function (e) {
-            e.preventDefault();
-        });
-
-        // Disable double-tap zoom completely
-        let lastTouchEnd = 0;
-        document.addEventListener('touchend', (event) => {
-            const now = new Date().getTime();
-            if (now - lastTouchEnd <= 300) {
-                event.preventDefault();
-            }
-            lastTouchEnd = now;
-        }, false);
-    </script>
 </head>
 <body>
     <div class="game-container">
         <div class="game-box">
-            <h1>Coin Flip</h1>
+
             <div id="result"></div>
             <div id="coin-container"></div>
             <button onclick="flipCoin()">Flip the Coin</button>
-            <button g="goBack" target="_blank2" onclick="location.href='https://rokinchik.github.io/sek158392/project/index.html'">Back to menu</button>
+            <button g="goBack" target="_blank2" onclick="location.href='https://rokinchik.github.io/Kaym1x/index.html'">Back to menu</button>
         </div>
     </div>
 
@@ -191,39 +136,42 @@
         
         renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(container.clientWidth, container.clientHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Adjust for device pixel ratio to improve scaling
         renderer.setClearColor(0x000000, 0);
         container.appendChild(renderer.domElement);
 
         // Lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 3);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 3); // Even brighter ambient light
         scene.add(ambientLight);
 
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 6);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 6); // Even stronger directional light
         directionalLight.position.set(5, 5, 5);
         scene.add(directionalLight);
 
-        const pointLight = new THREE.PointLight(0xffddaa, 3, 10);
+        const pointLight = new THREE.PointLight(0xffddaa, 3, 10); // Even warmer and brighter point light
         pointLight.position.set(2, 2, 2);
         scene.add(pointLight);
 
         camera.position.z = 5;
 
-        // Add button animations
-        const buttons = document.querySelectorAll('button');
-        buttons.forEach(button => {
-            button.addEventListener('click', function() {
-                const currentButton = this;
+        // Для всех кнопок добавим обработчик клика
+const buttons = document.querySelectorAll('button');
+buttons.forEach(button => {
+    button.addEventListener('click', function() {
+        // Добавим временный класс с анимацией нажатия
+        const currentButton = this;
 
-                setTimeout(() => {
-                    currentButton.classList.add('reset-animation');
+        // Удаляем класс анимации через 200ms
+        setTimeout(() => {
+            currentButton.classList.add('reset-animation');
 
-                    setTimeout(() => {
-                        currentButton.classList.remove('reset-animation');
-                    }, 200);
-                }, 200);
-            });
-        });
+            // Удаляем класс "reset-animation" после завершения анимации
+            setTimeout(() => {
+                currentButton.classList.remove('reset-animation');
+            }, 200);
+        }, 200); // Задержка по времени для завершения начальной анимации
+    });
+});
+
 
         // Load 3D model
         const loader = new GLTFLoader();
@@ -231,9 +179,10 @@
             coin = gltf.scene;
             scene.add(coin);
             
-            coin.rotation.set(0, 0, 0);
-            coin.position.set(0, 0, 0);
-            coin.scale.set(1.2, 1.2, 1.2);
+            // Initial position and scaling
+            coin.rotation.set(0, 0, 0); // Reset all rotations
+            coin.position.set(0, 0, 0); // Center the coin
+            coin.scale.set(1.55, 1.55, 1.55); // Slightly larger coin
             
             animate();
         });
@@ -262,8 +211,11 @@
                 const progress = elapsed / duration;
 
                 if (progress < 1) {
+                    // Parabolic trajectory for Y
                     const y = Math.sin(progress * Math.PI) * 2;
                     coin.position.y = y;
+
+                    // Rotation
                     coin.rotation.y = startRotation + (finalRotation * progress);
 
                     requestAnimationFrame(animateFlip);
@@ -278,8 +230,11 @@
             animateFlip();
         }
 
+        // Make flipCoin globally available
         window.flipCoin = flipCoin;
 
+
+        // Handle window resize
         window.addEventListener('resize', onWindowResize, false);
 
         function onWindowResize() {
@@ -291,7 +246,6 @@
             camera.updateProjectionMatrix();
             
             renderer.setSize(width, height);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Adjust renderer for device pixel ratio
         }
     </script>
 </body>
