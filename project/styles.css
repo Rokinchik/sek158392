@@ -1,0 +1,211 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    background: #121212;
+    color: #ffffff;
+    overflow-x: hidden;
+    padding-top: 80px;
+}
+
+.stars {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.star {
+    position: absolute;
+    background: #ffffff;
+    border-radius: 50%;
+    opacity: 0.8;
+    animation: twinkle var(--duration) infinite alternate;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 1; }
+}
+
+.container {
+    position: relative;
+    z-index: 1;
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 20px;
+    justify-items: center;
+}
+
+@media (min-width: 768px) {
+    .container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.game-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    width: 100%;
+    max-width: 220px;
+}
+
+.game-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+    border-color: rgba(0, 255, 255, 0.2);
+}
+
+.game-image {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.game-card:hover .game-image {
+    transform: scale(1.05);
+}
+
+.play-button {
+    background: #43a047;
+    color: white;
+    border: none;
+    width: 100%;
+    padding: 8px 0;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.play-button:hover {
+    background: #2e7d32;
+    box-shadow: 0 0 15px rgba(76, 175, 80, 0.4);
+}
+
+.top-bar {
+    position: fixed;
+    top: 20px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
+    z-index: 1000;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.language-switcher, .device-info {
+    padding: 8px 15px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.language-switcher:hover, .device-info:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.lang-flag {
+    width: 28px;
+    height: 28px;
+    object-fit: cover;
+    display: inline-block;
+    margin-right: 8px;
+    border-radius: 50%;
+    vertical-align: middle;
+}
+
+.lang-text, .device-info-text {
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 40px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+.lang-options {
+    position: absolute;
+    top: calc(100% + 5px);
+    right: 40px;
+    background: rgba(50, 50, 50, 0.8);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    transform-origin: top;
+    transform: scaleY(0);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    min-width: 120px;
+    pointer-events: none;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.lang-options.show {
+    transform: scaleY(1);
+    opacity: 1;
+    pointer-events: all;
+}
+
+.lang-option {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.lang-option:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.hidden {
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.hidden .lang-options {
+    transform: scaleY(0);
+    opacity: 0;
+    pointer-events: none;
+}
